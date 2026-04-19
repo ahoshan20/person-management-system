@@ -22,6 +22,31 @@ class PersonService
         return $data;
     }
 
+    public function paginate(int $perPage = 10, int $page = 1): array
+    {
+        $this->ensureFileExists();
+        $data = json_decode(Storage::get($this->file), true) ?? [];
+
+        // Sort newest first
+        usort($data, fn($a, $b) => $b['sn'] <=> $a['sn']);
+
+        $total = count($data);
+        $lastPage = (int) ceil($total / $perPage);
+
+        $offset = ($page - 1) * $perPage;
+        $items = array_slice($data, $offset, $perPage);
+
+        return [
+            'data' => $items,
+            'meta' => [
+                'current_page' => $page,
+                'per_page'     => $perPage,
+                'total'        => $total,
+                'last_page'    => $lastPage,
+            ],
+        ];
+    }
+
     public function find(string $id): ?array
     {
         $this->ensureFileExists();
