@@ -7,7 +7,7 @@ return [
     | API Authentication Key (must be exactly 25 chars)
     |─────────────────────────────────────────────────────
     */
-    'auth_key' => env('API_AUTH_KEY', 'DOORSOFT2024APIKEY1234567'),
+    'auth_key' => env('API_AUTH_KEY', 'DOORSOFT2024APIKEY12345678'),
 
     /*
     |─────────────────────────────────────────────────────
