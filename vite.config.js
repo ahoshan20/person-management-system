@@ -8,7 +8,13 @@ export default defineConfig({
             input: ['resources/js/app.js'],
             refresh: true,
         }),
-        vue(),
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => tag === 'iconify-icon'
+                }
+            }
+        }),
     ],
     resolve: {
         alias: {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Services\PersonService;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PersonController extends Controller
@@ -113,6 +114,7 @@ class PersonController extends Controller
     public function bulkDestroy(Request $request)
     {
         $ids = $request->input('ids', []);
+        Log::info('Bulk delete request', ['ids' => $ids]);
         foreach ($ids as $id) {
             $existing = $this->personService->find($id);
             if ($existing) {
