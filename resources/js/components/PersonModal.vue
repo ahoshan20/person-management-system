@@ -90,7 +90,7 @@
                                     @dragleave.prevent="dragOver = false"
                                     @drop.prevent="onDrop">
 
-                                    <input type="file" accept=".jpg,.jpeg,.png"
+                                    <input ref="fileInput" type="file" accept=".jpg,.jpeg,.png"
                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                         @change="onFileChange">
 
@@ -159,6 +159,8 @@ const form = reactive({ full_name: '', full_address: '' })
 const errors         = reactive({})
 const photoFile      = ref(null)
 const photoPreview   = ref(null)
+const fileInput      = ref(null)
+const photoObjectUrl = ref(null)
 const dragOver       = ref(false)
 const submitting     = ref(false)
 const uploadProgress = ref(0)
@@ -177,10 +179,13 @@ onMounted(() => {
 function clearError(field) { delete errors[field] }
 
 function clearPhoto() {
+    if (photoObjectUrl.value) {
+        URL.revokeObjectURL(photoObjectUrl.value)
+        photoObjectUrl.value = null
+    }
     photoFile.value    = null
-    photoPreview.value = props.mode === 'edit' && props.person
-        ? `/storage/thumbs/${props.person.thumb}`
-        : null
+    photoPreview.value = null
+    if (fileInput.value) fileInput.value.value = ''
     uploadProgress.value  = 0
     selectedFileName.value = ''
     delete errors.photo
@@ -214,9 +219,14 @@ async function handleFile(file) {
     delete errors.photo
     try {
         await validatePhotoClient(file)
+        if (photoObjectUrl.value) {
+            URL.revokeObjectURL(photoObjectUrl.value)
+            photoObjectUrl.value = null
+        }
         photoFile.value       = file
         selectedFileName.value = file.name
-        photoPreview.value    = URL.createObjectURL(file)
+        photoObjectUrl.value  = URL.createObjectURL(file)
+        photoPreview.value    = photoObjectUrl.value
         uploadProgress.value  = 0
     } catch (msg) {
         errors.photo = [msg]
