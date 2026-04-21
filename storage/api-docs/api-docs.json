@@ -1,0 +1,243 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Person Manager API",
+        "description": "## Personnel Management System REST API\n\n### Authentication\nEvery request must include two headers:\n- `X-Auth-Key`: A 25-character authentication key\n- `X-Organization`: Must be exactly **Door Soft**\n\n### Rate Limiting\nMaximum **5 requests per minute** per IP address.\n\n### Error Codes\n- AUTH_001 (401): Missing or invalid authentication key\n- AUTH_002 (403): Incorrect organization name\n- REC_001 (404): Person ID not found\n- ROUTE_001 (404): API endpoint not found\n- RATE_001 (429): Rate limit exceeded (max 5/min)\n- SERVER_001 (500): Unexpected server error",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API Server"
+        },
+        {
+            "url": "/api"
+        }
+    ],
+    "paths": {
+        "/persons": {
+            "get": {
+                "tags": [
+                    "Persons"
+                ],
+                "summary": "Retrieve persons",
+                "description": "Returns all persons or a specific person by their unique 6-digit ID. Photo name and storage path are excluded from the response.",
+                "operationId": "getPersons",
+                "parameters": [
+                    {
+                        "name": "X-Auth-Key",
+                        "in": "header",
+                        "description": "25-character authentication key",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "ABCDE12345FGHIJ67890KLMNO",
+                            "maxLength": 25,
+                            "minLength": 25
+                        }
+                    },
+                    {
+                        "name": "X-Organization",
+                        "in": "header",
+                        "description": "Organization name — must be exactly: Door Soft",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Door Soft"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Optional 6-digit unique person ID. Omit to retrieve all persons.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "145289",
+                            "maxLength": 6,
+                            "minLength": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "145289"
+                                                    },
+                                                    "full_name": {
+                                                        "type": "string",
+                                                        "example": "Denzel Washington"
+                                                    },
+                                                    "full_address": {
+                                                        "type": "string",
+                                                        "example": "221b Baker St, London NW1 6XE, United Kingdom"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "AUTH_001 — Missing or invalid authentication key",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error_code": {
+                                            "type": "string",
+                                            "example": "AUTH_001"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid or missing authentication key."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "AUTH_002 — Incorrect organization name",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error_code": {
+                                            "type": "string",
+                                            "example": "AUTH_002"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Organization name is incorrect."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "REC_001 — Person not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error_code": {
+                                            "type": "string",
+                                            "example": "REC_001"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No record found with the given ID."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "RATE_001 — Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error_code": {
+                                            "type": "string",
+                                            "example": "RATE_001"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Too many requests. Maximum 5 requests per minute allowed."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "SERVER_001 — Unexpected server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error_code": {
+                                            "type": "string",
+                                            "example": "SERVER_001"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An unexpected server error occurred."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "description": "25-character authentication key",
+                "name": "X-Auth-Key",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Persons",
+            "description": "Endpoints for retrieving person records"
+        }
+    ]
+}

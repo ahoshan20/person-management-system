@@ -104,7 +104,7 @@
                                             class="h-full w-full object-cover">
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ person.full_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900 max-w-48 truncate">{{ person.full_name }}</td>
                                 <td class="px-6 py-4">
                                     <ExpandableAddress :text="person.full_address" />
                                 </td>
